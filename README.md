@@ -8,7 +8,12 @@ A modern, high-contrast, Neo-Brutalism styled e-commerce application built with 
 
 ---
 
-## 🚀 Features
+## � Live Demo
+[**Click here to view the deployed application**](https://neo-mart-tau.vercel.app/)
+
+---
+
+## �🚀 Features
 
 ### Core Functionalities
 - **Product Exploration**: Browse a responsive grid of products fetched from an external API.
