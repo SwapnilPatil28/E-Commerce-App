@@ -1,16 +1,32 @@
 import React, {useState, useEffect} from 'react'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
+import { getProductById } from '../services/api'
+import useCart from '../hooks/useCart'
+import useWishlist from '../hooks/useWishlist'
+import { motion } from 'framer-motion'
+
+// Swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import '../index.css'; // Ensure tailwind is available 
 
 function ProductDetails() {
+    // 1. Get the product ID from the URL using useParams
     const { id } = useParams();
     const [data, setData] = useState({})
     const [loading, setLoading] = useState(true)
+    const { addToCart } = useCart();
+    const { addToWishlist } = useWishlist();
+
+    // 2. Fetch product details when the component mounts or ID changes
     useEffect(()=>{
         async function getData(){
             try {
-                let response = await axios.get(`https://dummyjson.com/products/${id}`);
-                setData(response.data);
+                let product = await getProductById(id);
+                setData(product);
             } catch(error){
                 console.error("Error fetching product:", error);
             } finally {
@@ -25,13 +41,33 @@ function ProductDetails() {
     if (!data.id) return <div className="min-h-screen flex items-center justify-center bg-white"><div className="bg-pink-400 border-4 border-black px-8 py-4 font-black text-2xl uppercase shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">Product not found</div></div>;
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto p-6">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto p-6"
+        >
             {/* LEFT COLUMN - SMALL */}
             <div className="lg:col-span-1 flex flex-col gap-4">
-                {/* Product Image */}
-                <div className="bg-yellow-300 border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                    {data.images && data.images.length > 0 && (
-                        <img src={data.images[0]} alt={data.title} className="w-full h-80 object-cover" />
+                {/* Product Image Gallery with Swiper */}
+                <div className="bg-white border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-96">
+                    {data.images && data.images.length > 0 ? (
+                        <Swiper
+                            modules={[Navigation, Pagination]}
+                            navigation
+                            pagination={{ clickable: true }}
+                            className="h-full w-full"
+                        >
+                            {data.images.map((img, index) => (
+                                <SwiperSlide key={index}>
+                                    <div className="w-full h-full bg-white flex items-center justify-center">
+                                        <img src={img} alt={`${data.title} - ${index}`} className="max-w-full max-h-full object-contain" />
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center font-black uppercase text-xl bg-gray-200">No Images</div>
                     )}
                 </div>
 
@@ -54,11 +90,15 @@ function ProductDetails() {
                         <div className="font-black text-4xl">{data.rating} ⭐</div>
                     </div>
 
-                    <button className="w-full bg-pink-400 border-4 border-black px-4 py-3 font-black uppercase tracking-wide transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mt-2">
+                    <button 
+                        onClick={() => addToCart({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
+                        className="w-full bg-pink-400 border-4 border-black px-4 py-3 font-black uppercase tracking-wide transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mt-2">
                         Add to Cart
                     </button>
 
-                    <button className="w-full bg-lime-300 border-4 border-black px-4 py-3 font-black uppercase tracking-wide transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                    <button 
+                        onClick={() => addToWishlist({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
+                        className="w-full bg-lime-300 border-4 border-black px-4 py-3 font-black uppercase tracking-wide transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                         ❤️ Add to Wishlist
                     </button>
                 </div>
@@ -180,7 +220,7 @@ function ProductDetails() {
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     )
 }
 
