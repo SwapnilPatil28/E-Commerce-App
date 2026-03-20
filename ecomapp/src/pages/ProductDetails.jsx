@@ -45,12 +45,12 @@ function ProductDetails() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto p-6"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto p-4 sm:p-6"
         >
             {/* LEFT COLUMN - SMALL */}
             <div className="lg:col-span-1 flex flex-col gap-4">
-                {/* Product Image Gallery with Swiper */}
-                <div className="bg-white border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-96">
+                {/* Product Image Gallery with Swiper - Responsive Height */}
+                <div className="bg-white border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-64 sm:h-80 md:h-96">
                     {data.images && data.images.length > 0 ? (
                         <Swiper
                             modules={[Navigation, Pagination]}
@@ -60,7 +60,7 @@ function ProductDetails() {
                         >
                             {data.images.map((img, index) => (
                                 <SwiperSlide key={index}>
-                                    <div className="w-full h-full bg-white flex items-center justify-center">
+                                    <div className="w-full h-full bg-white flex items-center justify-center p-4">
                                         <img src={img} alt={`${data.title} - ${index}`} className="max-w-full max-h-full object-contain" />
                                     </div>
                                 </SwiperSlide>
@@ -72,12 +72,12 @@ function ProductDetails() {
                 </div>
 
                 {/* Essential Details Box */}
-                <div className="bg-cyan-300 border-4 border-black p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
-                    <h1 className="font-black text-2xl uppercase tracking-tight leading-tight">{data.title}</h1>
+                <div className="bg-cyan-300 border-4 border-black p-4 sm:p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
+                    <h1 className="font-black text-xl sm:text-2xl uppercase tracking-tight leading-tight">{data.title}</h1>
                     
                     <div className="border-t-4 border-black pt-4">
-                        <div className="font-black text-sm uppercase text-gray-700 mb-1">Price</div>
-                        <div className="font-black text-5xl">${data.price}</div>
+                        <div className="font-black text-xs sm:text-sm uppercase text-gray-700 mb-1">Price</div>
+                        <div className="font-black text-4xl sm:text-5xl">${data.price}</div>
                         {data.discountPercentage && (
                             <div className="text-xs font-black uppercase mt-2 bg-white border-2 border-black px-2 py-1 inline-block shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                                 -{data.discountPercentage.toFixed(1)}%
@@ -85,22 +85,25 @@ function ProductDetails() {
                         )}
                     </div>
 
+
                     <div className="border-t-4 border-black pt-4">
-                        <div className="font-black text-sm uppercase text-gray-700 mb-1">Rating</div>
-                        <div className="font-black text-4xl">{data.rating} ⭐</div>
+                        <div className="font-black text-xs sm:text-sm uppercase text-gray-700 mb-1">Rating</div>
+                        <div className="font-black text-3xl sm:text-4xl">{data.rating} ⭐</div>
                     </div>
 
-                    <button 
-                        onClick={() => addToCart({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
-                        className="w-full bg-pink-400 border-4 border-black px-4 py-3 font-black uppercase tracking-wide transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mt-2">
-                        Add to Cart
-                    </button>
+                    <div className="grid grid-cols-2 gap-3 mt-2">
+                        <button 
+                            onClick={() => addToCart({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
+                            className="bg-pink-400 border-4 border-black px-2 py-3 font-black uppercase text-sm sm:text-base tracking-wide transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                            Add to Cart
+                        </button>
 
-                    <button 
-                        onClick={() => addToWishlist({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
-                        className="w-full bg-lime-300 border-4 border-black px-4 py-3 font-black uppercase tracking-wide transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                        ❤️ Add to Wishlist
-                    </button>
+                        <button 
+                            onClick={() => addToWishlist({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
+                            className="bg-lime-300 border-4 border-black px-2 py-3 font-black uppercase text-sm sm:text-base tracking-wide transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center text-center">
+                            ❤️ Wishlist
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -153,37 +156,37 @@ function ProductDetails() {
                 </div>
 
                 {/* Extended Details */}
-                <div className="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                    <h2 className="font-black text-2xl uppercase tracking-tight mb-4 border-b-4 border-black pb-3">Details</h2>
+                <div className="bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                    <h2 className="font-black text-xl sm:text-2xl uppercase tracking-tight mb-4 border-b-4 border-black pb-3">Details</h2>
                     <div className="space-y-3">
                         {data.warrantyInformation && (
-                            <div className="flex justify-between border-b-2 border-black pb-2">
-                                <span className="font-black uppercase text-sm">Warranty</span>
-                                <span className="font-bold">{data.warrantyInformation}</span>
+                            <div className="flex flex-col sm:flex-row sm:justify-between border-b-2 border-black pb-2 gap-1 sm:gap-0">
+                                <span className="font-black uppercase text-sm text-gray-700 sm:text-black">Warranty</span>
+                                <span className="font-bold text-base">{data.warrantyInformation}</span>
                             </div>
                         )}
                         {data.shippingInformation && (
-                            <div className="flex justify-between border-b-2 border-black pb-2">
-                                <span className="font-black uppercase text-sm">Shipping</span>
-                                <span className="font-bold">{data.shippingInformation}</span>
+                            <div className="flex flex-col sm:flex-row sm:justify-between border-b-2 border-black pb-2 gap-1 sm:gap-0">
+                                <span className="font-black uppercase text-sm text-gray-700 sm:text-black">Shipping</span>
+                                <span className="font-bold text-base">{data.shippingInformation}</span>
                             </div>
                         )}
                         {data.returnPolicy && (
-                            <div className="flex justify-between border-b-2 border-black pb-2">
-                                <span className="font-black uppercase text-sm">Return Policy</span>
-                                <span className="font-bold">{data.returnPolicy}</span>
+                            <div className="flex flex-col sm:flex-row sm:justify-between border-b-2 border-black pb-2 gap-1 sm:gap-0">
+                                <span className="font-black uppercase text-sm text-gray-700 sm:text-black">Return Policy</span>
+                                <span className="font-bold text-base">{data.returnPolicy}</span>
                             </div>
                         )}
                         {data.minimumOrderQuantity && (
-                            <div className="flex justify-between border-b-2 border-black pb-2">
-                                <span className="font-black uppercase text-sm">Min Order</span>
-                                <span className="font-bold">{data.minimumOrderQuantity}</span>
+                            <div className="flex flex-col sm:flex-row sm:justify-between border-b-2 border-black pb-2 gap-1 sm:gap-0">
+                                <span className="font-black uppercase text-sm text-gray-700 sm:text-black">Min Order</span>
+                                <span className="font-bold text-base">{data.minimumOrderQuantity}</span>
                             </div>
                         )}
                         {data.dimensions && (
-                            <div className="flex justify-between border-b-2 border-black pb-2">
-                                <span className="font-black uppercase text-sm">Dimensions</span>
-                                <span className="font-bold">{data.dimensions.width}x{data.dimensions.height}x{data.dimensions.depth} cm</span>
+                            <div className="flex flex-col sm:flex-row sm:justify-between border-b-2 border-black pb-2 gap-1 sm:gap-0">
+                                <span className="font-black uppercase text-sm text-gray-700 sm:text-black">Dimensions</span>
+                                <span className="font-bold text-base">{data.dimensions.width}x{data.dimensions.height}x{data.dimensions.depth} cm</span>
                             </div>
                         )}
                         {data.tags && data.tags.length > 0 && (
@@ -203,17 +206,17 @@ function ProductDetails() {
 
                 {/* Reviews Section */}
                 {data.reviews && data.reviews.length > 0 && (
-                    <div className="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                        <h2 className="font-black text-2xl uppercase tracking-tight mb-4 border-b-4 border-black pb-3">Reviews ({data.reviews.length})</h2>
+                    <div className="bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                        <h2 className="font-black text-xl sm:text-2xl uppercase tracking-tight mb-4 border-b-4 border-black pb-3">Reviews ({data.reviews.length})</h2>
                         <div className="space-y-4">
                             {data.reviews.map((review, idx) => (
                                 <div key={idx} className="bg-cyan-100 border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                                     <div className="flex justify-between mb-2">
-                                        <div className="font-black text-lg">{review.rating} ⭐</div>
+                                        <div className="font-black text-base sm:text-lg">{review.rating} ⭐</div>
                                         <div className="text-xs font-bold text-gray-600">{new Date(review.date).toLocaleDateString()}</div>
                                     </div>
-                                    <p className="font-bold text-base mb-2">{review.comment}</p>
-                                    <div className="font-black text-sm uppercase text-gray-700">{review.reviewerName}</div>
+                                    <p className="font-bold text-sm sm:text-base mb-2 italic">"{review.comment}"</p>
+                                    <div className="font-black text-xs sm:text-sm uppercase text-gray-700 text-right">- {review.reviewerName}</div>
                                 </div>
                             ))}
                         </div>
