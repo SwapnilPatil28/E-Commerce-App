@@ -29,23 +29,27 @@ function Navbar() {
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link to="/" className="text-black font-black uppercase text-lg hover:underline decoration-4 underline-offset-4 decoration-white">Home</Link>
-            <Link to="/products" className="text-black font-black uppercase text-lg hover:underline decoration-4 underline-offset-4 decoration-white">Products</Link>
+          <div className="hidden md:flex items-center gap-4">
+            <Link to="/" className="bg-white hover:bg-black hover:text-white border-4 border-black px-6 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              Home
+            </Link>
+            <Link to="/products" className="bg-white hover:bg-black hover:text-white border-4 border-black px-6 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              Products
+            </Link>
             
-            <div className="flex items-center gap-4 border-l-4 border-black pl-6">
-                <Link to="/wishlist" className="relative group">
-                    <span className="font-black uppercase text-lg">Wishlist</span>
+            <div className="flex items-center gap-4 border-l-4 border-black pl-6 ml-2">
+                <Link to="/wishlist" className="relative group bg-white hover:bg-black hover:text-white border-4 border-black px-6 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <span>Wishlist</span>
                     {wishlistItems.length > 0 && (
                         <span className="absolute -top-3 -right-3 bg-red-500 text-white text-xs border-2 border-black font-black px-1.5 py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-transform">
                             {wishlistItems.length}
                         </span>
                     )}
                 </Link>
-                <Link to="/cart" className="relative group">
-                    <span className="font-black uppercase text-lg">Cart</span>
+                <Link to="/cart" className="relative group bg-yellow-300 hover:bg-black hover:text-white border-4 border-black px-6 py-2 font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <span>Cart</span>
                     {cartCount > 0 && (
-                        <span className="absolute -top-3 -right-3 bg-yellow-300 text-black text-xs border-2 border-black font-black px-1.5 py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-transform">
+                        <span className="absolute -top-3 -right-3 bg-white text-black text-xs border-2 border-black font-black px-1.5 py-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[1px] group-hover:translate-y-[1px] transition-transform">
                             {cartCount}
                         </span>
                     )}
