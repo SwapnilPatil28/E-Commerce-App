@@ -14,18 +14,40 @@ A modern, high-contrast, Neo-Brutalism styled e-commerce application built with 
 ---
 
 ## 📸 Screenshots
-<div style="display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px;">
-  <img src="ecomapp/src/assets/image%20copy%2011.png" alt="Screenshot 12" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%2010.png" alt="Screenshot 11" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%209.png" alt="Screenshot 10" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%208.png" alt="Screenshot 9" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%207.png" alt="Screenshot 8" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%206.png" alt="Screenshot 7" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%205.png" alt="Screenshot 6" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%204.png" alt="Screenshot 5" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy%203.png" alt="Screenshot 4" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-  <img src="ecomapp/src/assets/image%20copy.png" alt="Screenshot 2" style="height: 400px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-</div>
+<table style="border: none; border-collapse: collapse; padding: 0; margin: 0;">
+  <tr>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%2011.png" alt="Screenshot 12" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%2010.png" alt="Screenshot 11" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%209.png" alt="Screenshot 10" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%208.png" alt="Screenshot 9" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%207.png" alt="Screenshot 8" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%206.png" alt="Screenshot 7" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%205.png" alt="Screenshot 6" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%204.png" alt="Screenshot 5" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy%203.png" alt="Screenshot 4" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+    <td style="border: none; padding-right: 20px; vertical-align: top;">
+      <img src="ecomapp/src/assets/image%20copy.png" alt="Screenshot 2" style="height: 400px; width: auto; max-width: none; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
+    </td>
+  </tr>
+</table>
 
 ---
 
