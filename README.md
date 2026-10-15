@@ -18,22 +18,6 @@ A high-contrast, modern **Neo-Brutalism styled full-stack e-commerce web applica
 
 ---
 
-## 📸 Screenshots Showcase
-<div style="display: flex; overflow-x: auto; gap: 20px; padding-bottom: 20px;">
-   <img src="ecomapp/frontend/src/assets/image%20copy%2011.png" alt="NeoMart Showcase 1" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%2010.png" alt="NeoMart Showcase 2" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%209.png" alt="NeoMart Showcase 3" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%208.png" alt="NeoMart Showcase 4" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%207.png" alt="NeoMart Showcase 5" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%206.png" alt="NeoMart Showcase 6" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%205.png" alt="NeoMart Showcase 7" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%204.png" alt="NeoMart Showcase 8" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy%203.png" alt="NeoMart Showcase 9" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-   <img src="ecomapp/frontend/src/assets/image%20copy.png" alt="NeoMart Showcase 10" style="height: 380px; width: auto; flex-shrink: 0; border: 4px solid black; box-shadow: 4px 4px 0px 0px black;" />
-</div>
-
----
-
 ## 🚀 Key Features
 
 ### 🎨 Neo-Brutalism UI & Design
@@ -261,22 +245,6 @@ npm run lint:frontend
 # Build frontend production bundle
 npm run build:frontend
 ```
-
----
-
-## 🚀 Pushing to GitHub with GitHub Desktop
-
-Because this repository is already connected to GitHub:
-1. Open **GitHub Desktop**.
-2. Select repository: **`E-Commerce-App`**.
-3. You will see:
-   - Untracked `node_modules` safely removed from Git.
-   - Refactored folder structure (`ecomapp/frontend` & `ecomapp/backend`).
-   - `.env` files safely ignored by `.gitignore`.
-   - Updated documentation and environment templates.
-4. Type a summary message (e.g., `feat: Full-stack refactor with Express backend, MongoDB, Razorpay, and clean docs`).
-5. Click **Commit to main**.
-6. Click **Push origin**.
 
 ---
 
