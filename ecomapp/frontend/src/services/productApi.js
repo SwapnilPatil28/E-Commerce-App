@@ -1,10 +1,13 @@
 import axios from 'axios'
+import { attachAuthHeader } from './authToken'
 
 const productApi = axios.create({
     baseURL: import.meta.env.VITE_PRODUCT_API_URL || 'http://localhost:5000/productapi',
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
+
+attachAuthHeader(productApi)
 
 // Products
 export const getProducts = async (search = "", category = "") => {

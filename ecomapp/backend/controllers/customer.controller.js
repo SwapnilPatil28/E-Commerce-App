@@ -8,6 +8,7 @@ const cookieOptions = {
 	httpOnly: true,
 	secure: process.env.NODE_ENV === 'production',
 	sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+	maxAge: 10 * 24 * 60 * 60 * 1000, // matches the 10d JWT expiry
 };
 
 function customerResponse(customer) {
@@ -88,7 +89,9 @@ export async function login(req, res) {
 
 		const token = generateToken(customer._id.toString());
 		res.cookie('shopkart_token', token, cookieOptions);
-		return res.json({ success: true, message: 'Login successful', customer: customerResponse(customer) });
+		// token is also returned so the frontend can fall back to a Bearer header when the
+		// browser blocks third-party cookies (Safari, Brave, incognito) on a cross-domain deploy
+		return res.json({ success: true, message: 'Login successful', token, customer: customerResponse(customer) });
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Unable to log in' });
 	}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { attachAuthHeader } from "./authToken";
 
 const baseURL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.replace(/\/customers$/, "")
@@ -9,6 +10,8 @@ const orderClient = axios.create({
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
+
+attachAuthHeader(orderClient);
 
 export const createPaymentOrder = async (shippingAddress) => {
   const { data } = await orderClient.post("/orders/create-payment-order", { shippingAddress });

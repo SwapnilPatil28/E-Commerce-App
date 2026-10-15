@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import customerApi from '../services/customerApi'
+import { setToken } from '../services/authToken'
 
 const AuthContext = createContext(null)
 
@@ -21,13 +22,18 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const { data } = await customerApi.post('/login', credentials)
+    setToken(data.token)
     setCustomer(data.customer)
     return data
   }
 
   const logout = async () => {
-    await customerApi.post('/logout')
-    setCustomer(null)
+    try {
+      await customerApi.post('/logout')
+    } finally {
+      setToken(null)
+      setCustomer(null)
+    }
   }
 
   const changePassword = async (passwords) => {
