@@ -1,1 +1,13 @@
-{}
+{
+  "name": "neo-mart",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Neo Mart - Full-Stack E-Commerce Application",
+  "scripts": {
+    "install:all": "npm install --prefix ecomapp/backend && npm install --prefix ecomapp/frontend",
+    "dev:backend": "npm run dev --prefix ecomapp/backend",
+    "dev:frontend": "npm run dev --prefix ecomapp/frontend",
+    "build:frontend": "npm run build --prefix ecomapp/frontend",
+    "lint:frontend": "npm run lint --prefix ecomapp/frontend"
+  }
+}
