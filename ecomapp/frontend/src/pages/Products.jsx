@@ -61,20 +61,21 @@ function Products() {
 
         // 2. Price Range Filter
         if (priceRange !== "all") {
-            const [min, max] = priceRange.split('-').map(Number);
+            // strip the trailing '+' of the open-ended option so it parses as a number
+            const [min, max] = priceRange.replace('+', '').split('-').map(Number);
             if (max) {
-                result = result.filter(p => p.price >= min && p.price <= max);
+                result = result.filter(p => p.priceInr >= min && p.priceInr <= max);
             } else {
-                // "1000+" case
-                result = result.filter(p => p.price >= min);
+                // open-ended "50000+" case
+                result = result.filter(p => p.priceInr >= min);
             }
         }
 
         // 3. Sorting
         if (order === "asc") {
-            result.sort((a,b) => a.price - b.price);
+            result.sort((a,b) => a.priceInr - b.priceInr);
         } else if (order === "desc") {
-            result.sort((a,b) => b.price - a.price);
+            result.sort((a,b) => b.priceInr - a.priceInr);
         } else if (order === "newest") {
              // Mocking "newest" by ID descending (assuming higher ID = newer)
              result.sort((a,b) => b.id - a.id);
@@ -120,11 +121,11 @@ function Products() {
                             onChange={(e) => setPriceRange(e.target.value)}
                             className="bg-white border-4 border-black p-3 font-bold uppercase focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer">
                             <option value="all">All Prices</option>
-                            <option value="0-50">$0 - $50</option>
-                            <option value="50-100">$50 - $100</option>
-                            <option value="100-500">$100 - $500</option>
-                            <option value="500-1000">$500 - $1000</option>
-                            <option value="1000+">$1000+</option>
+                            <option value="0-1000">₹0 - ₹1,000</option>
+                            <option value="1000-5000">₹1,000 - ₹5,000</option>
+                            <option value="5000-20000">₹5,000 - ₹20,000</option>
+                            <option value="20000-50000">₹20,000 - ₹50,000</option>
+                            <option value="50000+">₹50,000+</option>
                         </select>
                     </div>
 

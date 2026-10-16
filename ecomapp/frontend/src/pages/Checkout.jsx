@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
 import { createPaymentOrder, verifyPayment } from '../services/orderApi';
-import { formatPrice } from '../utils/helpers';
+import { formatInr } from '../utils/helpers';
 
 const schema = yup.object({
   fullName: yup
@@ -55,7 +55,7 @@ const loadRazorpayScript = () => {
 };
 
 function Checkout() {
-  const { cartItems, cartTotal, refreshCart } = useCart();
+  const { cartItems, cartTotal, cartSummary, refreshCart } = useCart();
   const { customer } = useAuth();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -95,6 +95,18 @@ function Checkout() {
         state: shippingData.state.trim(),
         pincode: shippingData.pincode.trim(),
       });
+
+      // The server has just re-priced the cart from the database. If that differs from
+      // the total on screen (e.g. a price changed since the cart was loaded), refresh
+      // and ask the shopper to review instead of charging an unexpected amount.
+      if (orderData.amount !== cartSummary.totalPaise) {
+        await refreshCart();
+        const msg = 'Prices were updated. Please review your order total and try again.';
+        setCheckoutError(msg);
+        toast.warning(msg);
+        setIsProcessing(false);
+        return;
+      }
 
       const options = {
         key: orderData.key,
@@ -367,11 +379,11 @@ function Checkout() {
                   <div className="flex-grow min-w-0">
                     <p className="font-black text-sm uppercase truncate">{item.title}</p>
                     <p className="text-xs font-bold text-gray-600">
-                      Qty: {item.quantity} × {formatPrice(item.price)}
+                      Qty: {item.quantity} × {formatInr(item.priceInr)}
                     </p>
                   </div>
                   <div className="font-black text-sm text-right shrink-0">
-                    {formatPrice(item.price * item.quantity)}
+                    {formatInr(item.lineTotalInr)}
                   </div>
                 </div>
               );
@@ -381,7 +393,7 @@ function Checkout() {
           <div className="bg-white border-4 border-black p-4 flex flex-col gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <div className="flex justify-between font-bold text-base">
               <span>Items Total:</span>
-              <span>{formatPrice(cartTotal)}</span>
+              <span>{formatInr(cartTotal)}</span>
             </div>
             <div className="flex justify-between font-bold text-base">
               <span>Delivery Fee:</span>
@@ -390,7 +402,7 @@ function Checkout() {
             <div className="border-t-4 border-black my-1"></div>
             <div className="flex justify-between font-black text-2xl">
               <span>Grand Total:</span>
-              <span className="text-pink-600">{formatPrice(cartTotal)}</span>
+              <span className="text-pink-600">{formatInr(cartTotal)}</span>
             </div>
           </div>
         </div>

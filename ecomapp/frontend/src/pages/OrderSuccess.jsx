@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { getOrderById } from '../services/orderApi';
-import { formatPrice, formatInr } from '../utils/helpers';
+import { formatInr } from '../utils/helpers';
 
 function OrderSuccess() {
   const { id } = useParams();
@@ -117,12 +117,12 @@ function OrderSuccess() {
                   <div>
                     <p className="font-black text-sm uppercase leading-tight">{item.name}</p>
                     <p className="text-xs font-bold text-gray-600">
-                      Qty: {item.quantity} × {formatPrice(item.price)}
+                      Qty: {item.quantity} × {formatInr(item.priceInr)}
                     </p>
                   </div>
                 </div>
                 <span className="font-black text-base shrink-0">
-                  {formatPrice(item.price * item.quantity)}
+                  {formatInr(item.lineTotalInr)}
                 </span>
               </div>
             ))}

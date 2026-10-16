@@ -4,11 +4,28 @@ import Order from "../models/order.model.js";
 import Customer from "../models/customer.model.js";
 import Product from "../models/product.model.js";
 import { getRazorpay } from "../config/razorpay.js";
-
-// USD to INR conversion rate (1 USD = 84 INR)
-const USD_TO_INR = 84;
+import { usdToPaise, paiseToInr, CURRENCY } from "../config/pricing.js";
 
 const VALID_STATUSES = ["PENDING_PAYMENT", "PLACED", "CONFIRMED", "SHIPPED", "DELIVERED"];
+
+// Razorpay rejects orders below Rs.1
+const MIN_ORDER_PAISE = 100;
+
+// Adds INR display fields to an order. Orders placed before INR prices were stored
+// on items fall back to converting the saved USD price with the server's rate.
+function serializeOrder(order) {
+  const plain = typeof order.toObject === "function" ? order.toObject() : { ...order };
+  plain.items = (plain.items || []).map((item) => {
+    const unitPaise =
+      typeof item.priceInr === "number" ? Math.round(item.priceInr * 100) : usdToPaise(item.price);
+    return {
+      ...item,
+      priceInr: paiseToInr(unitPaise),
+      lineTotalInr: paiseToInr(unitPaise * item.quantity),
+    };
+  });
+  return plain;
+}
 
 export async function createPaymentOrder(req, res) {
   try {
@@ -50,8 +67,10 @@ export async function createPaymentOrder(req, res) {
       return res.status(400).json({ success: false, message: "Your cart is empty. Add products before checkout." });
     }
 
+    // The charge is calculated ONLY from database prices and the quantities saved in
+    // the server-side cart. Nothing price-related from the request body is trusted.
     const orderItems = [];
-    let serverTotal = 0;
+    let totalPaise = 0;
 
     for (const item of customer.cart) {
       const productId = item.product?._id || item.product;
@@ -72,21 +91,32 @@ export async function createPaymentOrder(req, res) {
         });
       }
 
-      const itemTotal = Number(product.price) * requestedQty;
-      serverTotal += itemTotal;
+      const unitPaise = usdToPaise(product.price);
+      if (!Number.isSafeInteger(unitPaise) || unitPaise <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Pricing is unavailable for ${product.title || product.name}. Please remove it from your cart.`,
+        });
+      }
+
+      totalPaise += unitPaise * requestedQty;
 
       orderItems.push({
         product: product._id,
         name: product.title || product.name || "Product",
         price: Number(product.price),
+        priceInr: paiseToInr(unitPaise),
         quantity: requestedQty,
         image: product.thumbnail || product.images?.[0] || "",
       });
     }
 
-    // Convert USD total to INR, then to Razorpay paise (INR × 100)
-    const totalAmountInr = Math.round(serverTotal * USD_TO_INR * 100) / 100;
-    const amountInPaise = Math.round(totalAmountInr * 100);
+    if (totalPaise < MIN_ORDER_PAISE) {
+      return res.status(400).json({ success: false, message: "Order total must be at least ₹1." });
+    }
+
+    const amountInPaise = totalPaise;
+    const totalAmountInr = paiseToInr(totalPaise);
 
     // Clean up any previous uncompleted pending payment attempts for this user
     await Order.deleteMany({ user: customer._id, status: "PENDING_PAYMENT" });
@@ -110,7 +140,7 @@ export async function createPaymentOrder(req, res) {
     const razorpayClient = getRazorpay();
     const razorpayOrder = await razorpayClient.orders.create({
       amount: amountInPaise,
-      currency: "INR",
+      currency: CURRENCY,
       receipt: newOrder._id.toString(),
     });
 
@@ -123,9 +153,9 @@ export async function createPaymentOrder(req, res) {
       shopKartOrderId: newOrder._id,
       razorpayOrderId: razorpayOrder.id,
       amount: amountInPaise,
-      currency: "INR",
+      currency: CURRENCY,
       key: process.env.RAZORPAY_KEY_ID,
-      order: newOrder,
+      order: serializeOrder(newOrder),
     });
   } catch (error) {
     console.error("createPaymentOrder error:", error);
@@ -157,6 +187,17 @@ export async function verifyPayment(req, res) {
       return res.status(403).json({ success: false, message: "Unauthorized access to this order" });
     }
 
+    // Already completed (double click, retry, replayed request): return it unchanged.
+    // This must come first so a repeated call can neither double-deduct stock nor
+    // downgrade a paid order.
+    if (order.paymentStatus === "PAID") {
+      return res.status(200).json({
+        success: true,
+        message: "Payment already verified",
+        order: serializeOrder(order),
+      });
+    }
+
     const trustedOrderId = order.razorpayOrderId || razorpay_order_id;
     const signPayload = `${trustedOrderId}|${razorpay_payment_id}`;
 
@@ -171,12 +212,24 @@ export async function verifyPayment(req, res) {
       return res.status(400).json({ success: false, message: "Invalid payment signature" });
     }
 
-    order.paymentStatus = "PAID";
-    order.status = "PLACED";
-    order.razorpayPaymentId = razorpay_payment_id;
-    await order.save();
+    // Atomic PENDING/FAILED -> PAID transition: if two requests race, only one wins
+    // and only the winner deducts stock.
+    const paidOrder = await Order.findOneAndUpdate(
+      { _id: order._id, paymentStatus: { $ne: "PAID" } },
+      { $set: { paymentStatus: "PAID", status: "PLACED", razorpayPaymentId: razorpay_payment_id } },
+      { new: true }
+    );
 
-    for (const item of order.items) {
+    if (!paidOrder) {
+      const existing = await Order.findById(order._id);
+      return res.status(200).json({
+        success: true,
+        message: "Payment already verified",
+        order: serializeOrder(existing),
+      });
+    }
+
+    for (const item of paidOrder.items) {
       await Product.findByIdAndUpdate(item.product, {
         $inc: { stock: -item.quantity },
       });
@@ -187,7 +240,7 @@ export async function verifyPayment(req, res) {
     return res.status(200).json({
       success: true,
       message: "Payment verified and order confirmed",
-      order,
+      order: serializeOrder(paidOrder),
     });
   } catch (error) {
     console.error("verifyPayment error:", error);
@@ -204,7 +257,7 @@ export async function getMyOrders(req, res) {
     const orders = await Order.find(filter).sort({ createdAt: -1 });
     return res.status(200).json({
       success: true,
-      orders,
+      orders: orders.map(serializeOrder),
     });
   } catch (error) {
     console.error("getMyOrders error:", error);
@@ -231,7 +284,7 @@ export async function getOrderById(req, res) {
 
     return res.status(200).json({
       success: true,
-      order,
+      order: serializeOrder(order),
     });
   } catch (error) {
     console.error("getOrderById error:", error);
@@ -260,13 +313,31 @@ export async function updateOrderStatus(req, res) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
+    // Previously any logged-in user could change any order. Now: your own order,
+    // already paid, and only one step forward at a time.
+    if (order.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized to update this order" });
+    }
+
+    if (order.paymentStatus !== "PAID") {
+      return res.status(400).json({ success: false, message: "Only paid orders can change status" });
+    }
+
+    const currentIndex = VALID_STATUSES.indexOf(order.status);
+    if (VALID_STATUSES.indexOf(status) !== currentIndex + 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Order status can only move forward one step at a time",
+      });
+    }
+
     order.status = status;
     await order.save();
 
     return res.status(200).json({
       success: true,
       message: `Order status updated to ${status}`,
-      order,
+      order: serializeOrder(order),
     });
   } catch (error) {
     console.error("updateOrderStatus error:", error);

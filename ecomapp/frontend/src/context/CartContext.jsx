@@ -1,7 +1,8 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import customerApi from "../services/customerApi";
 import { useAuth } from "./AuthContext";
+import { getProductKey } from "../utils/helpers";
 
 const CartContext = createContext();
 
@@ -20,12 +21,24 @@ const normalizeCartItem = (item) => {
     _id: product._id || normalizedProductId,
     id: product.id || normalizedProductId,
     title: product.title || product.name || "Product",
-    price: Number(product.price || 0),
+    // INR values below are computed by the server; the client never converts currency
+    priceInr: Number(product.priceInr || 0),
+    lineTotalInr: Number(item?.lineTotalInr || 0),
     thumbnail: product.thumbnail || product.images?.[0] || "",
     stock: Number(product.stock || 0),
     quantity: Number(item?.quantity || 1),
   };
 };
+
+const EMPTY_SUMMARY = { itemCount: 0, subtotalInr: 0, totalInr: 0, totalPaise: 0, currency: "INR" };
+
+const normalizeSummary = (summary) => ({
+  itemCount: Number(summary?.itemCount || 0),
+  subtotalInr: Number(summary?.subtotalInr || 0),
+  totalInr: Number(summary?.totalInr || 0),
+  totalPaise: Number(summary?.totalPaise || 0),
+  currency: summary?.currency || "INR",
+});
 
 export const CartProvider = ({ children }) => {
   const { customer, isLoading: isAuthLoading } = useAuth();
@@ -33,14 +46,26 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState("");
+  // Server-calculated totals (INR). The charge is re-calculated again at payment time.
+  const [cartSummary, setCartSummary] = useState(EMPTY_SUMMARY);
+
+  // Products currently being added: drives the "Adding..." button state
+  const [addingKeys, setAddingKeys] = useState([]);
+  const addingRef = useRef(new Set());
 
   const [wishlistItems, setWishlistItems] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(true);
   const [wishlistError, setWishlistError] = useState("");
 
+  const applyCartResponse = (data) => {
+    setCartItems((data.cart || []).map(normalizeCartItem).filter(Boolean));
+    setCartSummary(normalizeSummary(data.summary));
+  };
+
   const refreshCart = async () => {
     if (!customer) {
       setCartItems([]);
+      setCartSummary(EMPTY_SUMMARY);
       setCartError("");
       setCartLoading(false);
       return;
@@ -51,10 +76,10 @@ export const CartProvider = ({ children }) => {
 
     try {
       const { data } = await customerApi.get('/cart');
-      const normalizedCart = (data.cart || []).map(normalizeCartItem).filter(Boolean);
-      setCartItems(normalizedCart);
+      applyCartResponse(data);
     } catch (error) {
       setCartItems([]);
+      setCartSummary(EMPTY_SUMMARY);
       setCartError(error.response?.data?.message || 'Unable to load your cart.');
     } finally {
       setCartLoading(false);
@@ -126,13 +151,23 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
+    // Ignore repeat clicks while this product is already being added
+    const key = getProductKey(product);
+    if (addingRef.current.has(key)) {
+      return;
+    }
+    addingRef.current.add(key);
+    setAddingKeys((keys) => [...keys, key]);
+
     try {
       const { data } = await customerApi.post(`/cart/${encodeURIComponent(productId)}`);
-      const normalizedCart = (data.cart || []).map(normalizeCartItem).filter(Boolean);
-      setCartItems(normalizedCart);
+      applyCartResponse(data);
       toast.success(data.message || 'Added to cart');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to add product to cart');
+    } finally {
+      addingRef.current.delete(key);
+      setAddingKeys((keys) => keys.filter((k) => k !== key));
     }
   };
 
@@ -143,8 +178,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const { data } = await customerApi.delete(`/cart/${encodeURIComponent(productId)}`);
-      const normalizedCart = (data.cart || []).map(normalizeCartItem).filter(Boolean);
-      setCartItems(normalizedCart);
+      applyCartResponse(data);
       toast.info(data.message || 'Removed from cart');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to remove item from cart');
@@ -163,8 +197,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const { data } = await customerApi.patch(`/cart/${encodeURIComponent(productId)}`, { quantity: newQuantity });
-      const normalizedCart = (data.cart || []).map(normalizeCartItem).filter(Boolean);
-      setCartItems(normalizedCart);
+      applyCartResponse(data);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to update cart quantity');
     }
@@ -173,12 +206,13 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (!customer) {
       setCartItems([]);
+      setCartSummary(EMPTY_SUMMARY);
       return;
     }
 
     try {
       const { data } = await customerApi.delete('/cart');
-      setCartItems([]);
+      applyCartResponse(data);
       toast.info(data.message || 'Cart cleared');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to clear cart');
@@ -222,7 +256,9 @@ export const CartProvider = ({ children }) => {
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  // Total comes from the server, not from multiplying prices in the browser
+  const cartTotal = cartSummary.totalInr;
+  const isAdding = (product) => addingKeys.includes(getProductKey(product));
 
   return (
     <CartContext.Provider
@@ -242,6 +278,8 @@ export const CartProvider = ({ children }) => {
         refreshCart,
         cartCount,
         cartTotal,
+        cartSummary,
+        isAdding,
       }}
     >
       {children}

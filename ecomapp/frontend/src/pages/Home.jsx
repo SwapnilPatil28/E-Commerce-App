@@ -26,9 +26,9 @@ function Home() {
 
     // Sort by Price
     if (order === "asc") {
-        result.sort((a,b) => a.price - b.price);
+        result.sort((a,b) => a.priceInr - b.priceInr);
     } else if (order === "desc") {
-        result.sort((a,b) => b.price - a.price);
+        result.sort((a,b) => b.priceInr - a.priceInr);
     }
     
     return result;

@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { getProductById } from '../services/productApi'
 import useCart from '../hooks/useCart'
 import useWishlist from '../hooks/useWishlist'
+import { formatInr } from '../utils/helpers'
 
 // Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -18,7 +19,7 @@ function ProductDetails() {
     const { id } = useParams();
     const [data, setData] = useState({})
     const [loading, setLoading] = useState(true)
-    const { addToCart } = useCart();
+    const { addToCart, isAdding } = useCart();
     const { addToWishlist } = useWishlist();
 
     // 2. Fetch product details when the component mounts or ID changes
@@ -77,7 +78,7 @@ function ProductDetails() {
                     
                     <div className="border-t-4 border-black pt-4">
                         <div className="font-black text-xs sm:text-sm uppercase text-gray-700 mb-1">Price</div>
-                        <div className="font-black text-4xl sm:text-5xl">${data.price}</div>
+                        <div className="font-black text-4xl sm:text-5xl">{formatInr(data.priceInr)}</div>
                         {data.discountPercentage && (
                             <div className="text-xs font-black uppercase mt-2 bg-white border-2 border-black px-2 py-1 inline-block shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                                 -{data.discountPercentage.toFixed(1)}%
@@ -93,9 +94,11 @@ function ProductDetails() {
 
                     <div className="grid grid-cols-2 gap-3 mt-2">
                         <button 
-                            onClick={() => addToCart({ id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail || data.images[0] })}
-                            className="bg-pink-400 border-4 border-black px-2 py-3 font-black uppercase text-sm sm:text-base tracking-wide transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
-                            Add to Cart
+                            onClick={() => addToCart({ _id: data._id, id: data.id })}
+                            disabled={isAdding(data)}
+                            aria-busy={isAdding(data)}
+                            className="disabled:opacity-60 disabled:cursor-wait bg-pink-400 border-4 border-black px-2 py-3 font-black uppercase text-sm sm:text-base tracking-wide transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                            {isAdding(data) ? 'Adding...' : 'Add to Cart'}
                         </button>
 
                         <button 

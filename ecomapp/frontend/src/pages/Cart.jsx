@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import useCart from '../hooks/useCart'
+import { formatInr } from '../utils/helpers'
 
 function Cart() {
   const { cartItems, cartLoading, cartError, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
@@ -61,7 +62,7 @@ function Cart() {
 
                     <div className="flex-grow text-center md:text-left">
                         <h3 className="font-black text-xl uppercase leading-tight">{item.title}</h3>
-                        <div className="font-bold text-lg text-gray-700">${item.price}</div>
+                        <div className="font-bold text-lg text-gray-700">{formatInr(item.priceInr)}</div>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -82,7 +83,7 @@ function Cart() {
                     </div>
 
                     <div className="font-black text-xl w-24 text-center">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatInr(item.lineTotalInr)}
                     </div>
 
                     <button
@@ -100,11 +101,11 @@ function Cart() {
       <div className="bg-cyan-300 border-4 border-black p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center md:items-end gap-4">
           <div className="flex justify-between w-full md:w-1/2 text-xl font-bold border-b-4 border-black pb-2">
               <span>Subtotal:</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>{formatInr(cartTotal)}</span>
           </div>
           <div className="flex justify-between w-full md:w-1/2 text-3xl font-black">
               <span>Total:</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>{formatInr(cartTotal)}</span>
           </div>
           <Link to="/checkout" className="inline-block w-full md:w-auto bg-white hover:bg-black hover:text-white border-4 border-black px-8 py-4 font-black uppercase text-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none mt-4 text-center">
               Proceed to Checkout

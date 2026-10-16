@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Customer from '../models/customer.model.js';
 import Product from '../models/product.model.js';
 import generateToken from '../utils/generateToken.js';
+import { withPriceInr, summarizeCart, lineTotalInr } from '../config/pricing.js';
 
 const cookieOptions = {
 	httpOnly: true,
@@ -17,6 +18,22 @@ function customerResponse(customer) {
 		fullName: customer.fullName,
 		email: customer.email,
 		phone: customer.phone,
+	};
+}
+
+// Cart response: every price/total is calculated here from database prices and the
+// server's conversion rate. The frontend only displays these numbers.
+function cartPayload(customer) {
+	const entries = (customer.cart || []).filter((entry) => entry.product && typeof entry.product === 'object');
+
+	return {
+		cart: entries.map((entry) => ({
+			_id: entry._id,
+			product: withPriceInr(entry.product),
+			quantity: entry.quantity,
+			lineTotalInr: lineTotalInr(entry.product.price, entry.quantity),
+		})),
+		summary: summarizeCart(entries.map((entry) => ({ price: entry.product.price, quantity: entry.quantity }))),
 	};
 }
 
@@ -139,7 +156,7 @@ export const getWishlist = async(req, res) => {
         return res.status(200).json({
 			success: true,
 			message: 'Wishlist fetched successfully',
-			wishlist: customer.wishlist,
+			wishlist: customer.wishlist.filter(Boolean).map(withPriceInr),
 		});
     } catch {
 		return res.status(500).json({ success: false, message: 'Unable to get wishlist' });
@@ -197,7 +214,7 @@ export const getCart = async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: 'Cart fetched successfully',
-			cart: customer.cart,
+			...cartPayload(customer),
 		});
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Unable to get cart' });
@@ -234,7 +251,7 @@ export const addToCart = async (req, res) => {
 		return res.status(existingItem ? 200 : 201).json({
 			success: true,
 			message: 'Cart updated',
-			cart: updatedCustomer.cart,
+			...cartPayload(updatedCustomer),
 		});
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Unable to add product to cart' });
@@ -272,7 +289,7 @@ export const updateCartItem = async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: 'Cart updated',
-			cart: updatedCustomer.cart,
+			...cartPayload(updatedCustomer),
 		});
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Unable to update cart' });
@@ -301,7 +318,7 @@ export const removeCartItem = async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			message: 'Product removed from cart',
-			cart: updatedCustomer.cart,
+			...cartPayload(updatedCustomer),
 		});
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Unable to remove product from cart' });
@@ -313,7 +330,7 @@ export const clearCart = async (req, res) => {
 		const customer = await Customer.findById(req.user._id);
 		customer.cart = [];
 		await customer.save();
-		return res.status(200).json({ success: true, message: 'Cart cleared', cart: [] });
+		return res.status(200).json({ success: true, message: 'Cart cleared', ...cartPayload(customer) });
 	} catch (error) {
 		return res.status(500).json({ success: false, message: 'Unable to clear cart' });
 	}

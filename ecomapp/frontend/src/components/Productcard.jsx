@@ -2,10 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import useCart from "../hooks/useCart";
 import useWishlist from "../hooks/useWishlist";
-import { formatPrice } from "../utils/helpers";
+import { formatInr } from "../utils/helpers";
 
 function ProductCard({ data }) {
-  const { addToCart, cartItems } = useCart();
+  const { addToCart, cartItems, isAdding } = useCart();
+  const adding = isAdding(data);
   const { addToWishlist } = useWishlist();
 
   const inCart = cartItems.some((item) => {
@@ -56,13 +57,15 @@ function ProductCard({ data }) {
       </div>
 
       <div className="mt-4 pt-2 flex flex-col gap-3">
-        <div className="font-black text-4xl tracking-tighter self-end">{formatPrice(data.price)}</div>
+        <div className="font-black text-4xl tracking-tighter self-end">{formatInr(data.priceInr)}</div>
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => addToCart({ _id: data._id, id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail, stock: data.stock })}
-            className="w-full bg-white hover:bg-black hover:text-white border-4 border-black px-4 py-3 font-black uppercase text-center transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
+            onClick={() => addToCart({ _id: data._id, id: data.id })}
+            disabled={adding}
+            aria-busy={adding}
+            className="w-full disabled:opacity-60 disabled:cursor-wait bg-white hover:bg-black hover:text-white border-4 border-black px-4 py-3 font-black uppercase text-center transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
           >
-            {inCart ? 'Add Another' : 'Add to Cart'}
+            {adding ? 'Adding...' : inCart ? 'Add Another' : 'Add to Cart'}
           </button>
           <Link to={"/products/" + data.id} className="w-full inline-flex items-center justify-center bg-white hover:bg-black hover:text-white border-4 border-black px-4 py-3 font-black uppercase text-center transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
               View Details

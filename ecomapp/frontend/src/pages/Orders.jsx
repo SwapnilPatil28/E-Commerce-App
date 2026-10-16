@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMyOrders, updateOrderStatus } from '../services/orderApi';
-import { formatPrice, formatInr } from '../utils/helpers';
+import { formatInr } from '../utils/helpers';
 import { toast } from 'react-toastify';
 
 const STATUS_STEPS = ['PENDING_PAYMENT', 'PLACED', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
@@ -190,12 +190,12 @@ function Orders() {
                       <div>
                         <p className="font-black text-sm uppercase">{item.name}</p>
                         <p className="text-xs font-bold text-gray-500">
-                          {item.quantity} unit{item.quantity > 1 ? 's' : ''} × {formatPrice(item.price)}
+                          {item.quantity} unit{item.quantity > 1 ? 's' : ''} × {formatInr(item.priceInr)}
                         </p>
                       </div>
                     </div>
                     <span className="font-black text-sm">
-                      {formatPrice(item.price * item.quantity)}
+                      {formatInr(item.lineTotalInr)}
                     </span>
                   </div>
                 ))}

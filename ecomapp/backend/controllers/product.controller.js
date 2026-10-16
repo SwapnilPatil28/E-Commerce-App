@@ -1,4 +1,5 @@
 import Product from '../models/product.model.js';
+import { withPriceInr } from '../config/pricing.js';
 
 export const createProduct = async (req, res) => {
     try {
@@ -30,7 +31,7 @@ export const createProduct = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: 'Product added successfully',
-            product: createdProduct,
+            product: withPriceInr(createdProduct),
         });
 
     } catch (err) {
@@ -71,7 +72,7 @@ export const getProducts = async (req, res) => {
             success: true,
             count: products.length,
             message: 'Products returned successfully',
-            products: products,
+            products: products.map(withPriceInr),
         });
     } catch (err) {
         return res.status(500).json({ success: false, message: 'Unable to get products' });
@@ -100,7 +101,7 @@ export const getProductById = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'Product found successfully',
-            product: product,
+            product: withPriceInr(product),
         });
 
     } catch (err) {

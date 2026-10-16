@@ -2,10 +2,11 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import useWishlist from '../hooks/useWishlist'
 import useCart from '../hooks/useCart'
+import { formatInr } from '../utils/helpers'
 
 function Wishlist() {
   const { wishlistItems, wishlistLoading, wishlistError, removeFromWishlist } = useWishlist();
-  const { addToCart } = useCart();
+  const { addToCart, isAdding } = useCart();
 
   if (wishlistLoading) {
     return <div className="py-24 text-center font-black text-2xl uppercase">Loading wishlist...</div>
@@ -47,13 +48,15 @@ function Wishlist() {
                 </div>
                 
                 <h3 className="font-black text-xl uppercase leading-tight mb-2 line-clamp-1">{item.title}</h3>
-                <div className="font-black text-2xl mb-4">${item.price}</div>
+                <div className="font-black text-2xl mb-4">{formatInr(item.priceInr)}</div>
                 
                 <div className="flex flex-col gap-2 mt-auto">
                     <button 
                         onClick={() => addToCart(item)}
-                        className="bg-cyan-400 border-4 border-black px-4 py-2 font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none">
-                        Move to Cart
+                        disabled={isAdding(item)}
+                        aria-busy={isAdding(item)}
+                        className="disabled:opacity-60 disabled:cursor-wait bg-cyan-400 border-4 border-black px-4 py-2 font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none">
+                        {isAdding(item) ? 'Adding...' : 'Move to Cart'}
                     </button>
                 </div>
             </div>
