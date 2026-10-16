@@ -8,11 +8,10 @@ import { usdToPaise, paiseToInr, CURRENCY } from "../config/pricing.js";
 
 const VALID_STATUSES = ["PENDING_PAYMENT", "PLACED", "CONFIRMED", "SHIPPED", "DELIVERED"];
 
-// Razorpay rejects orders below Rs.1
+// Razorpay minimum order amount (₹1)
 const MIN_ORDER_PAISE = 100;
 
-// Adds INR display fields to an order. Orders placed before INR prices were stored
-// on items fall back to converting the saved USD price with the server's rate.
+// Adds INR price fields to an order (older orders convert the saved USD price)
 function serializeOrder(order) {
   const plain = typeof order.toObject === "function" ? order.toObject() : { ...order };
   plain.items = (plain.items || []).map((item) => {
@@ -67,8 +66,7 @@ export async function createPaymentOrder(req, res) {
       return res.status(400).json({ success: false, message: "Your cart is empty. Add products before checkout." });
     }
 
-    // The charge is calculated ONLY from database prices and the quantities saved in
-    // the server-side cart. Nothing price-related from the request body is trusted.
+    // Charge comes only from DB prices and the saved cart, never from the request
     const orderItems = [];
     let totalPaise = 0;
 
@@ -187,9 +185,7 @@ export async function verifyPayment(req, res) {
       return res.status(403).json({ success: false, message: "Unauthorized access to this order" });
     }
 
-    // Already completed (double click, retry, replayed request): return it unchanged.
-    // This must come first so a repeated call can neither double-deduct stock nor
-    // downgrade a paid order.
+    // Already paid: return as is (prevents double stock deduction)
     if (order.paymentStatus === "PAID") {
       return res.status(200).json({
         success: true,
@@ -212,8 +208,7 @@ export async function verifyPayment(req, res) {
       return res.status(400).json({ success: false, message: "Invalid payment signature" });
     }
 
-    // Atomic PENDING/FAILED -> PAID transition: if two requests race, only one wins
-    // and only the winner deducts stock.
+    // Atomic PAID update so only one request deducts stock
     const paidOrder = await Order.findOneAndUpdate(
       { _id: order._id, paymentStatus: { $ne: "PAID" } },
       { $set: { paymentStatus: "PAID", status: "PLACED", razorpayPaymentId: razorpay_payment_id } },
@@ -313,8 +308,7 @@ export async function updateOrderStatus(req, res) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    // Previously any logged-in user could change any order. Now: your own order,
-    // already paid, and only one step forward at a time.
+    // Only the owner can advance a paid order, one step at a time
     if (order.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: "Unauthorized to update this order" });
     }

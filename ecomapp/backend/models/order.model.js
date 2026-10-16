@@ -11,12 +11,12 @@ const orderItemSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Catalogue price in USD at the time of purchase (kept for reference)
+    // USD price at purchase
     price: {
       type: Number,
       required: true,
     },
-    // Unit price in INR as charged, computed on the server at purchase time
+    // INR unit price charged
     priceInr: {
       type: Number,
     },

@@ -21,8 +21,7 @@ function customerResponse(customer) {
 	};
 }
 
-// Cart response: every price/total is calculated here from database prices and the
-// server's conversion rate. The frontend only displays these numbers.
+// Cart response with server-calculated INR prices and totals
 function cartPayload(customer) {
 	const entries = (customer.cart || []).filter((entry) => entry.product && typeof entry.product === 'object');
 

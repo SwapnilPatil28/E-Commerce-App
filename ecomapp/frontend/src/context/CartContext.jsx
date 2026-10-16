@@ -21,7 +21,7 @@ const normalizeCartItem = (item) => {
     _id: product._id || normalizedProductId,
     id: product.id || normalizedProductId,
     title: product.title || product.name || "Product",
-    // INR values below are computed by the server; the client never converts currency
+    // INR values come from the server
     priceInr: Number(product.priceInr || 0),
     lineTotalInr: Number(item?.lineTotalInr || 0),
     thumbnail: product.thumbnail || product.images?.[0] || "",
@@ -46,10 +46,10 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
   const [cartError, setCartError] = useState("");
-  // Server-calculated totals (INR). The charge is re-calculated again at payment time.
+  // Cart totals calculated by the server
   const [cartSummary, setCartSummary] = useState(EMPTY_SUMMARY);
 
-  // Products currently being added: drives the "Adding..." button state
+  // Products being added (drives the "Adding..." button)
   const [addingKeys, setAddingKeys] = useState([]);
   const addingRef = useRef(new Set());
 
@@ -151,7 +151,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    // Ignore repeat clicks while this product is already being added
+    // Ignore repeat clicks while adding
     const key = getProductKey(product);
     if (addingRef.current.has(key)) {
       return;
@@ -256,7 +256,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  // Total comes from the server, not from multiplying prices in the browser
+  // Total comes from the server
   const cartTotal = cartSummary.totalInr;
   const isAdding = (product) => addingKeys.includes(getProductKey(product));
 

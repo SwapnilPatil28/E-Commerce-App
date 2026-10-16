@@ -96,9 +96,7 @@ function Checkout() {
         pincode: shippingData.pincode.trim(),
       });
 
-      // The server has just re-priced the cart from the database. If that differs from
-      // the total on screen (e.g. a price changed since the cart was loaded), refresh
-      // and ask the shopper to review instead of charging an unexpected amount.
+      // Stop if the server's amount differs from the total on screen
       if (orderData.amount !== cartSummary.totalPaise) {
         await refreshCart();
         const msg = 'Prices were updated. Please review your order total and try again.';

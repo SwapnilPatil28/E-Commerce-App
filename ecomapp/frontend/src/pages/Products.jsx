@@ -61,12 +61,12 @@ function Products() {
 
         // 2. Price Range Filter
         if (priceRange !== "all") {
-            // strip the trailing '+' of the open-ended option so it parses as a number
+            // drop the '+' so "50000+" parses as a number
             const [min, max] = priceRange.replace('+', '').split('-').map(Number);
             if (max) {
                 result = result.filter(p => p.priceInr >= min && p.priceInr <= max);
             } else {
-                // open-ended "50000+" case
+                // no upper bound
                 result = result.filter(p => p.priceInr >= min);
             }
         }
